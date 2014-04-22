@@ -166,9 +166,10 @@ class ApiClient {
 		$lastLetter = substr($arr[1], -1);
 		$resourceName = strtolower($arr[1]);
 		$methodName = strtolower($arr[0]) . "Resource";
-		if ($lastLetter == "s") $resourceName .= "s";
+		if ($lastLetter != "s") $resourceName .= "s";
 		else $methodName .= "s";
 		$argCount = count($args);
+
 		if ($argCount > 1) {
 			return $this->$methodName($resourceName, $args[0], $args[1]);
 		}
