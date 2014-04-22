@@ -1,6 +1,6 @@
 {
 "name": "metapic/api-client",
-    "description": "My first Composer project",
+    "description": "MetaPic PHP Client API",
     "authors": [
         {
             "name": "Marcus Dalgren",
@@ -13,11 +13,12 @@
     ],
     "minimum-stability": "dev",
     "require": {
-        "php": ">=5.4.0"
+        "php": ">=5.4.0",
+	    "guzzle/guzzle": "3.8.*@dev"
     },
     "autoload": {
         "psr-4": {
-            "MetaPic": "src/"
+            "MetaPic\\": "src/"
         }
     }
 }

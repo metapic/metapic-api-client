@@ -3,7 +3,6 @@
 namespace MetaPic;
 
 use Exception;
-use fGrammar;
 use Guzzle\Http\Exception\BadResponseException;
 use Guzzle\Http\Message\EntityEnclosingRequest;
 use Guzzle\Http\Message\Request;
@@ -12,18 +11,18 @@ use Guzzle\Service\Client;
 /**
  * @method array|string getUsers(array $userData = [])
  * @method array|string getUser(\int $userId)
- * @method array|string addUser(array $userData)
- * @method array|string editUser(\int $userId, array $userData)
+ * @method array|string createUser(array $userData)
+ * @method array|string updateUser(\int $userId, array $userData)
  * @method array|string deleteUser(\int $userId, array $userData = [])
  * @method array|string getImages(array $imageData = [])
  * @method array|string getImage(\int $imageId, array $imageData = [])
- * @method array|string addImage(array $imageData)
- * @method array|string editImage(\int $imageId, array $imageData)
+ * @method array|string createImage(array $imageData)
+ * @method array|string updateImage(\int $imageId, array $imageData)
  * @method array|string deleteImage(\int $imageId, array $imageData = [])
  * @method array|string getTags(array $tagData = [])
  * @method array|string getTag(\int $tagId, array $tagData = [])
- * @method array|string addTag(array $tagData)
- * @method array|string editTag(\int $tagId, array $tagData)
+ * @method array|string createTag(array $tagData)
+ * @method array|string updateTag(\int $tagId, array $tagData)
  * @method array|string deleteTag(\int $tagId, array $tagData = [])
  */
 class ApiClient {
@@ -90,14 +89,14 @@ class ApiClient {
 		return $response;
 	}
 
-	private function addResource($resourceName, array $resourceData = []) {
+	private function createResource($resourceName, array $resourceData = []) {
 		$request = $this->setupRequest("post", $resourceName, $resourceData);
 		$request->addPostFields($resourceData);
 		$response = $this->sendRequest($request);
 		return $response;
 	}
 
-	private function editResource($resourceName, $resourceId, array $resourceData = []) {
+	private function updateResource($resourceName, $resourceId, array $resourceData = []) {
 		$request = $this->setupRequest("put", $resourceName . "/" . $resourceId, $resourceData);
 		$request->addPostFields($resourceData);
 		$response = $this->sendRequest($request);
@@ -167,7 +166,7 @@ class ApiClient {
 		$lastLetter = substr($arr[1], -1);
 		$resourceName = strtolower($arr[1]);
 		$methodName = strtolower($arr[0]) . "Resource";
-		if ($lastLetter != "s") $resourceName = fGrammar::pluralize($resourceName);
+		if ($lastLetter == "s") $resourceName .= "s";
 		else $methodName .= "s";
 		$argCount = count($args);
 		if ($argCount > 1) {
