@@ -1,0 +1,23 @@
+{
+"name": "metapic/api-client",
+    "description": "My first Composer project",
+    "authors": [
+        {
+            "name": "Marcus Dalgren",
+            "email": "marcus@raket.nu"
+        },
+	    {
+		    "name": "Erik Axelsson",
+		    "email": "erikaxelsson1@gmail.com"
+	    }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=5.4.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "MetaPic": "src/"
+        }
+    }
+}
