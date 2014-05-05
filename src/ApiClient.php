@@ -24,8 +24,7 @@ use Guzzle\Service\Client;
  * @method array|string createTag(array $tagData)
  * @method array|string updateTag(\int $tagId, array $tagData)
  * @method array|string deleteTag(\int $tagId, array $tagData = [])
- * @method array|string getAllClicks(array $clickData = [])
- */
+*/
 class ApiClient {
 	private $baseUrl;
 	private $clientId;
