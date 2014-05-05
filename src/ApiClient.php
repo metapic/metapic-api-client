@@ -24,6 +24,7 @@ use Guzzle\Service\Client;
  * @method array|string createTag(array $tagData)
  * @method array|string updateTag(\int $tagId, array $tagData)
  * @method array|string deleteTag(\int $tagId, array $tagData = [])
+ * @method array|string getAllClicks(array $clickData = [])
  */
 class ApiClient {
 	private $baseUrl;
@@ -112,6 +113,12 @@ class ApiClient {
 
 	public function getUserAccessToken($userId) {
 		$request = $this->setupRequest("get", "users/".$userId."/access-token");
+		$response = $this->sendRequest($request);
+		return $response;
+	}
+
+	public function getAllClicks($clickData) {
+		$request = $this->setupRequest("get", "clicks/all-clicks");
 		$response = $this->sendRequest($request);
 		return $response;
 	}
