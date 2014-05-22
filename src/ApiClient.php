@@ -119,7 +119,7 @@ class ApiClient {
 	}
 
 	public function getUserConfig($userId) {
-		$request = $this->setupRequest("get", "users/".$userId."/access-config");
+		$request = $this->setupRequest("get", "users/".$userId."/user-config");
 		$response = $this->sendRequest($request);
 		return $response;
 	}
