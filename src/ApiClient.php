@@ -34,7 +34,7 @@ class ApiClient {
 	private $apiClient;
 	private $lastRequest;
 
-	public function __construct($baseUrl, $clientId, $secretKey) {
+	public function __construct($baseUrl, $clientId = null, $secretKey = null) {
 		$this->baseUrl = $baseUrl;
 		$this->clientId = $clientId;
 		$this->secretKey = $secretKey;
@@ -75,6 +75,27 @@ class ApiClient {
 	 */
 	public function setSecretKey($secretKey) {
 		$this->secretKey = $secretKey;
+	}
+
+	/**
+	 * @return Client
+	 */
+	public function getApiClient() {
+		return $this->apiClient;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getBaseUrl() {
+		return $this->baseUrl;
+	}
+
+	/**
+	 * @param string $baseUrl
+	 */
+	public function setBaseUrl( $baseUrl ) {
+		$this->baseUrl = $baseUrl;
 	}
 
 	private function getResources($resourceName, array $resourceData = []) {
