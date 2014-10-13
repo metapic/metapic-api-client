@@ -6,6 +6,7 @@ use Exception;
 use Guzzle\Http\Exception\BadResponseException;
 use Guzzle\Http\Message\EntityEnclosingRequest;
 use Guzzle\Http\Message\Request;
+use Guzzle\Http\Message\Response;
 use Guzzle\Service\Client;
 
 /**
@@ -32,13 +33,16 @@ class ApiClient {
 	private $clientId;
 	private $secretKey;
 	private $apiClient;
+
+	/* @var Request $lastRequest */
 	private $lastRequest;
+	/* @var Response $lastResponse */
+	private $lastResponse;
 
 	public function __construct($baseUrl, $clientId = null, $secretKey = null) {
 		$this->baseUrl = $baseUrl;
 		$this->clientId = $clientId;
 		$this->secretKey = $secretKey;
-
 		$this->apiClient = new Client($this->baseUrl);
 	}
 
@@ -89,6 +93,10 @@ class ApiClient {
 	 */
 	public function getBaseUrl() {
 		return $this->baseUrl;
+	}
+
+	public function getResponseCode() {
+		return (is_object($this->lastResponse)) ? $this->lastResponse->getStatusCode( ) : null;
 	}
 
 	/**
@@ -158,6 +166,7 @@ class ApiClient {
 		catch (BadResponseException $e) {
 			$response = $e->getResponse();
 		}
+		$this->lastResponse = $response;
 		try {
 			return $response->json();
 		}
