@@ -13,13 +13,19 @@ use Guzzle\Http\Message\Request;
 
 class UserApiClient extends ApiClient {
 	private $userToken;
+	private $userClientId;
+	private $userSecretKey;
 
 	/**
 	 * @param string $baseUrl
-	 * @param string $userToken
+	 * @param null   $clientId
+	 * @param null   $secretKey
+	 *
+	 * @internal param string $userToken
 	 */
-	public function __construct($baseUrl, $userToken = null) {
-		$this->userToken = $userToken;
+	public function __construct($baseUrl, $clientId = null, $secretKey = null) {
+		$this->userClientId = $clientId;
+		$this->userSecretKey = $secretKey;
 		parent::__construct($baseUrl);
 	}
 
@@ -37,6 +43,12 @@ class UserApiClient extends ApiClient {
 		$this->userToken = $userToken;
 	}
 
+	public function getUser() {
+		$request = $this->setupRequest("get", "users", []);
+		$response = $this->sendRequest($request);
+		return array_shift($response);
+	}
+
 	/**
 	 * @param string $callMethod
 	 * @param string $url
@@ -44,11 +56,16 @@ class UserApiClient extends ApiClient {
 	 *
 	 * @return Request|EntityEnclosingRequest
 	 */
-	private function setupRequest($callMethod, $url, array $arguments = []) {
+	protected function setupRequest($callMethod, $url, array $arguments = []) {
 		$request = $this->getApiClient()->$callMethod("/" . $url);
+		$arguments["user_client_id"] = $this->userClientId;
+		$timeStamp = date("Y-m-d H:i:s");
+		$authToken = $this->getAuthToken($arguments, $this->userSecretKey, $timeStamp);
+
 		$request->getQuery()
-			->set("user_token", $this->userToken)
-			->set("mtpc_timestamp", date("Y-m-d H:i:s"));
+			->set("access_token", $authToken)
+			->set("mtpc_timestamp", $timeStamp)
+			->set("user_client_id", $this->userClientId);
 		return $request;
 	}
 } 

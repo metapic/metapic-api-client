@@ -158,7 +158,7 @@ class ApiClient {
 	 *
 	 * @return array|\Guzzle\Http\Message\Response
 	 */
-	private function sendRequest(Request $request) {
+	protected function sendRequest(Request $request) {
 		try {
 			$response = $request->send();
 			$this->lastRequest = $request;
@@ -182,20 +182,16 @@ class ApiClient {
 	 *
 	 * @return Request|EntityEnclosingRequest
 	 */
-	private function setupRequest($callMethod, $url, array $arguments = []) {
+	protected  function setupRequest($callMethod, $url, array $arguments = []) {
 		$request = $this->apiClient->$callMethod("/" . $url);
 		$arguments["client_id"] = $this->clientId;
-		$arguments["mtpc_timestamp"] = date("Y-m-d H:i:s");
-		ksort($arguments);
-		$authData = implode('&', array_map(function ($v, $k) {
-			return $k . '=' . $v;
-		}, $arguments, array_keys($arguments)));
-		$authKey = hash_hmac("sha256", $authData, $this->secretKey);
+		$timeStamp = date("Y-m-d H:i:s");
+		$authKey = $this->getAuthToken($this->clientId, $this->secretKey, $timeStamp);
 
 		$request->getQuery()
 			->set("access_token", $authKey)
 			->set("client_id", $this->clientId)
-			->set("mtpc_timestamp", $arguments["mtpc_timestamp"]);
+			->set("mtpc_timestamp", $timeStamp);
 		return $request;
 	}
 
@@ -217,5 +213,23 @@ class ApiClient {
 		else {
 			return $this->$methodName($resourceName);
 		}
+	}
+
+	/**
+	 * @param array $arguments
+	 *
+	 * @param       $secretKey
+	 * @param       $timeStamp
+	 *
+	 * @return array
+	 */
+	protected function getAuthToken(array $arguments, $secretKey, $timeStamp) {
+		$arguments["mtpc_timestamp"] = $timeStamp;
+		ksort($arguments);
+		$authData = implode('&', array_map(function ($v, $k) {
+			return $k . '=' . $v;
+		}, $arguments, array_keys($arguments)));
+		$authKey = hash_hmac("sha256", $authData, $secretKey);
+		return $authKey;
 	}
 }
