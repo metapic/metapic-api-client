@@ -46,6 +46,8 @@ class UserApiClient extends ApiClient {
 	public function getUser() {
 		$request = $this->setupRequest("get", "users", []);
 		$response = $this->sendRequest($request);
+		var_dump($response);
+		die();
 		return array_shift($response);
 	}
 
