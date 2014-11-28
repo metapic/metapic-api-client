@@ -186,7 +186,7 @@ class ApiClient {
 		$request = $this->apiClient->$callMethod("/" . $url);
 		$arguments["client_id"] = $this->clientId;
 		$timeStamp = date("Y-m-d H:i:s");
-		$authKey = $this->getAuthToken($this->clientId, $this->secretKey, $timeStamp);
+		$authKey = $this->getAuthToken($arguments, $this->secretKey, $timeStamp);
 
 		$request->getQuery()
 			->set("access_token", $authKey)
