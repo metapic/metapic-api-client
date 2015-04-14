@@ -147,6 +147,12 @@ class ApiClient {
 		return $response;
 	}
 
+	public function getIframeToken($userId) {
+		$request = $this->setupRequest("get", "users/".$userId."/iframe-token");
+		$response = $this->sendRequest($request);
+		return $response;
+	}
+
 	public function getUserConfig($userId) {
 		$request = $this->setupRequest("get", "users/".$userId."/user-config");
 		$response = $this->sendRequest($request);
