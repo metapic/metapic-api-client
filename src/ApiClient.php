@@ -191,6 +191,8 @@ class ApiClient {
 		$data = ["access_token" => $token];
 		$request = $this->setupRequest("post", "/generateIframeRandomCode", $data);
 		$request->addPostFields($data);
+		$response = $this->sendRequest($request);
+
 	}
 
 	/**
