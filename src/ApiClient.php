@@ -6,6 +6,7 @@ use Exception;
 use Guzzle\Http\Exception\BadResponseException;
 use Guzzle\Http\Message\EntityEnclosingRequest;
 use Guzzle\Http\Message\Request;
+use Guzzle\Http\Message\RequestInterface;
 use Guzzle\Http\Message\Response;
 use Guzzle\Service\Client;
 
@@ -159,12 +160,45 @@ class ApiClient {
 		return $response;
 	}
 
+	public function login($email, $password) {
+		$request = $this->getApiClient()->post("users/login", null, [
+			"email" => $email,
+			"password" => $password
+		]);
+		return $this->sendRequest($request);
+	}
+
+	public function checkClient($clientKey) {
+		$data = ["mtpc_client" => $clientKey];
+		$request = $this->setupRequest("post", "clients/check", $data);
+		$request->addPostFields($data);
+		return $this->sendRequest($request);
+	}
+
+	public function getUserByEmail($email) {
+		$users = $this->getResources("users", ["email" => $email]);
+		return count($users) == 1 ? $users[0] : null;
+	}
+
+	public function activateUser($email) {
+		$data = ["email" => $email];
+		$request = $this->setupRequest("post", "users/activate", $data);
+		$request->addPostFields($data);
+		return $this->sendRequest($request);
+	}
+
+	public function generateIframeCode($token) {
+		$data = ["access_token" => $token];
+		$request = $this->setupRequest("post", "/generateIframeRandomCode", $data);
+		$request->addPostFields($data);
+	}
+
 	/**
-	 * @param Request $request
+	 * @param RequestInterface $request
 	 *
 	 * @return array|\Guzzle\Http\Message\Response
 	 */
-	protected function sendRequest(Request $request) {
+	protected function sendRequest(RequestInterface $request) {
 		try {
 			$response = $request->send();
 			$this->lastRequest = $request;
@@ -193,7 +227,6 @@ class ApiClient {
 		$arguments["client_id"] = $this->clientId;
 		$timeStamp = date("Y-m-d H:i:s");
 		$authKey = $this->getAuthToken($arguments, $this->secretKey, $timeStamp);
-
 		$request->getQuery()
 			->set("access_token", $authKey)
 			->set("client_id", $this->clientId)
