@@ -165,7 +165,8 @@ class ApiClient {
 			"email" => $email,
 			"password" => $password
 		]);
-		return $this->sendRequest($request);
+		$user = $this->sendRequest($request);
+		return (isset($user["id"])) ? $user : null;
 	}
 
 	public function checkClient($clientKey) {
@@ -245,6 +246,7 @@ class ApiClient {
 		else $methodName .= "s";
 		$argCount = count($args);
 
+		if (!method_exists($this, $methodName)) throw new ApiException("Method not allowed");
 		if ($argCount > 1) {
 			return $this->$methodName($resourceName, $args[0], $args[1]);
 		}
