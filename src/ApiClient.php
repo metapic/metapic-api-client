@@ -197,9 +197,10 @@ class ApiClient {
 	}
 
 	public function getClientClicksByDate($userId = null, array $resourceData = []) {
-		$url = "clicks/by-date/";
+		$url = "clicks/by-date";
 		if (is_numeric($userId)) $url .= "/".$userId;
 		$request = $this->setupRequest("get", $url, $resourceData);
+		$request->getQuery()->merge($resourceData);
 		return $this->sendRequest($request);
 	}
 
