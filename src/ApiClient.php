@@ -45,6 +45,8 @@ class ApiClient {
 		$this->clientId = $clientId;
 		$this->secretKey = $secretKey;
 		$this->apiClient = new Client($this->baseUrl);
+		$this->apiClient->setDefaultOption('timeout', 10);
+		$this->apiClient->setDefaultOption('connect_timeout', 5);
 	}
 
 	/**
