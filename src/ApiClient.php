@@ -149,6 +149,12 @@ class ApiClient {
 		$response = $this->sendRequest($request);
 		return $response;
 	}
+    public function deepLinkBlogPost($userId,$blogPost) {
+        $data = ["blogpost" => $blogPost];
+        $request = $this->setupRequest("post", "deepLinkBlogPost/".$userId,$data);
+        $response = $this->sendRequest($request);
+        return $response;
+    }
 
 	public function getIframeToken($userId) {
 		$request = $this->setupRequest("get", "users/".$userId."/iframe-token");
