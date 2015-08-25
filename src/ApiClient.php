@@ -150,8 +150,9 @@ class ApiClient {
 		return $response;
 	}
     public function deepLinkBlogPost($userId,$blogPost) {
-        $data = ["blogpost" => $blogPost];
+        $data = ["blogPost" => $blogPost];
         $request = $this->setupRequest("post", "deepLinkBlogPost/".$userId,$data);
+	    $request->addPostFields($data);
         $response = $this->sendRequest($request);
         return $response;
     }
