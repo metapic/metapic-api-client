@@ -178,6 +178,15 @@ class ApiClient {
 		return (isset($user["id"])) ? $user : null;
 	}
 
+	public function register($email, $password) {
+		$request = $this->getApiClient()->post("users/register", null, [
+			"email" => $email,
+			"password" => $password
+		]);
+		$user = $this->sendRequest($request);
+		return (isset($user["id"])) ? $user : null;
+	}
+
 	public function checkClient($clientKey) {
 		$data = ["mtpc_client" => $clientKey];
 		$request = $this->setupRequest("post", "clients/check", $data);
@@ -228,6 +237,7 @@ class ApiClient {
 		}
 		$this->lastResponse = $response;
 		try {
+
 			return $response->json();
 		}
 		catch (Exception $e) {
