@@ -149,9 +149,12 @@ class ApiClient {
 		$response = $this->sendRequest($request);
 		return $response;
 	}
-    public function deepLinkBlogPost($userId,$blogPost) {
+    public function deepLinkBlogPost($userId,$blogPost, $userToken = null) {
         $data = ["blogPost" => $blogPost];
-        $request = $this->setupRequest("post", "deepLinkBlogPost/".$userId,$data);
+	    if ($userToken != null)
+		    $data["user_access_token"] = $userToken;
+
+        $request = $this->setupRequest("post", "deepLinkBlogPost/".$userId, $data);
 	    $request->addPostFields($data);
         $response = $this->sendRequest($request);
         return $response;
