@@ -149,7 +149,8 @@ class ApiClient {
 		$response = $this->sendRequest($request);
 		return $response;
 	}
-    public function deepLinkBlogPost($userId,$blogPost, $userToken = null) {
+
+	public function deepLinkBlogPost($userId, $blogPost, $userToken = null) {
         $data = ["blogPost" => $blogPost];
 	    if ($userToken != null)
 		    $data["user_access_token"] = $userToken;
@@ -159,6 +160,15 @@ class ApiClient {
         $response = $this->sendRequest($request);
         return $response;
     }
+
+	public function creeateDeepLinks($userId, array $links) {
+		$data = ["userId" => $userId, "links" => json_encode($links)];
+
+		$request = $this->setupRequest("post", "deep-links", $data);
+		$request->addPostFields($data);
+		$response = $this->sendRequest($request);
+		return $response;
+	}
 
 	public function getIframeToken($userId) {
 		$request = $this->setupRequest("get", "users/".$userId."/iframe-token");
