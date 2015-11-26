@@ -161,7 +161,7 @@ class ApiClient {
         return $response;
     }
 
-	public function creeateDeepLinks($userId, array $links) {
+	public function createDeepLinks($userId, array $links) {
 		$data = ["userId" => $userId, "links" => json_encode($links)];
 
 		$request = $this->setupRequest("post", "deep-links", $data);
