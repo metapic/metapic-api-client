@@ -229,6 +229,12 @@ class ApiClient {
 
 	}
 
+	public function getPopularTags($userId) {
+		$url = "tags/popular/".$userId;
+		$request = $this->setupRequest("get", $url);
+		return $this->sendRequest($request);
+	}
+
 	public function getClientClicksByDate($userId = null, array $resourceData = []) {
 		$url = "clicks/by-date";
 		if (is_numeric($userId)) $url .= "/".$userId;
