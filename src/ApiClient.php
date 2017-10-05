@@ -3,12 +3,10 @@
 namespace MetaPic;
 
 use Exception;
-use Guzzle\Http\Exception\BadResponseException;
-use Guzzle\Http\Message\EntityEnclosingRequest;
-use Guzzle\Http\Message\Request;
-use Guzzle\Http\Message\RequestInterface;
-use Guzzle\Http\Message\Response;
-use Guzzle\Service\Client;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Psr7\Response;
 use Log;
 
 /**
@@ -46,9 +44,7 @@ class ApiClient {
 		$this->baseUrl = $baseUrl;
 		$this->clientId = $clientId;
 		$this->secretKey = $secretKey;
-		$this->apiClient = new Client($this->baseUrl);
-		$this->apiClient->setDefaultOption('timeout', 10);
-		$this->apiClient->setDefaultOption('connect_timeout', 5);
+		$this->apiClient = new Client(['base_uri' => $this->baseUrl, 'timeout' => 10, 'connect_timeout' => 5]);
 	}
 
 	/**
@@ -112,43 +108,37 @@ class ApiClient {
 	}
 
 	private function getResources($resourceName, array $resourceData = []) {
-		$request = $this->setupRequest("get", $resourceName, $resourceData);
-		$request->getQuery()->merge($resourceData);
-		$response = $this->sendRequest($request);
+		$requestData = $this->setupRequestData($resourceData);
+		$response = $this->sendRequest('get', $resourceName, $requestData);
 		return $response;
 	}
 
 	private function getResource($resourceName, $resourceId, array $resourceData = []) {
-		$request = $this->setupRequest("get", $resourceName . "/" . $resourceId, $resourceData);
-		$request->getQuery()->merge($resourceData);
-		$response = $this->sendRequest($request);
+		$requestData = $this->setupRequestData($resourceData);
+		$response = $this->sendRequest('get', $resourceName . "/" . $resourceId, $requestData);
 		return $response;
 	}
 
 	private function createResource($resourceName, array $resourceData = []) {
-		$request = $this->setupRequest("post", $resourceName, $resourceData);
-		$request->addPostFields($resourceData);
-		$response = $this->sendRequest($request);
+		$requestData = $this->setupRequestData($resourceData);
+		$response = $this->sendRequest("post", $resourceName, $requestData);
 		return $response;
 	}
 
 	private function updateResource($resourceName, $resourceId, array $resourceData = []) {
-		$request = $this->setupRequest("put", $resourceName . "/" . $resourceId, $resourceData);
-		$request->addPostFields($resourceData);
-		$response = $this->sendRequest($request);
+		$requestData = $this->setupRequestData($resourceData);
+		$response = $this->sendRequest('put', $resourceName . "/" . $resourceId, $requestData);
 		return $response;
 	}
 
 	private function deleteResource($resourceName, $resourceId, array $resourceData = []) {
-		$request = $this->setupRequest("delete", $resourceName . "/" . $resourceId, $resourceData);
-		$request->getQuery()->merge($resourceData);
-		$response = $this->sendRequest($request);
+		$requestData = $this->setupRequestData($resourceData);
+		$response = $this->sendRequest('delete', $resourceName . "/" . $resourceId, $requestData);
 		return $response;
 	}
 
 	public function getUserAccessToken($userId) {
-		$request = $this->setupRequest("get", "users/".$userId."/access-token");
-		$response = $this->sendRequest($request);
+		$response = $this->sendRequest("get", "users/".$userId."/access-token", $this->setupRequestData());
 		return $response;
 	}
 
@@ -157,56 +147,48 @@ class ApiClient {
 	    if ($userToken != null)
 		    $data["user_access_token"] = $userToken;
 
-        $request = $this->setupRequest("post", "deepLinkBlogPost/".$userId, $data);
-	    $request->addPostFields($data);
-        $response = $this->sendRequest($request);
+		$requestData = $this->setupRequestData($data);
+		$response = $this->sendRequest("post", "deepLinkBlogPost/".$userId, $requestData);
         return $response;
     }
 
 	public function createDeepLinks($userId, array $links) {
 		$data = ["userId" => $userId, "links" => json_encode($links)];
 
-		$request = $this->setupRequest("post", "deep-links", $data);
-		$request->addPostFields($data);
-		$response = $this->sendRequest($request);
+		$requestData = $this->setupRequestData($data);
+		$response = $this->sendRequest("post", "deep-links", $requestData);
 		return $response;
 	}
 
 	public function getIframeToken($userId) {
-		$request = $this->setupRequest("get", "users/".$userId."/iframe-token");
-		$response = $this->sendRequest($request);
+		$response = $this->sendRequest("get", "users/".$userId."/iframe-token", $this->setupRequestData());
 		return $response;
 	}
 
 	public function getUserConfig($userId) {
-		$request = $this->setupRequest("get", "users/".$userId."/user-config");
-		$response = $this->sendRequest($request);
+		$response = $this->sendRequest("get", "users/".$userId."/user-config", $this->setupRequestData());
 		return $response;
 	}
 
 	public function login($email, $password) {
-		$request = $this->getApiClient()->post("users/login", null, [
+		$user = $this->sendRequest("post", "users/login", [
 			"email" => $email,
 			"password" => $password
 		]);
-		$user = $this->sendRequest($request);
 		return (isset($user["id"])) ? $user : null;
 	}
 
 	public function register($email, $password) {
-		$request = $this->getApiClient()->post("users/register", null, [
+		$user = $this->sendRequest("post", "users/register", [
 			"email" => $email,
 			"password" => $password
 		]);
-		$user = $this->sendRequest($request);
 		return (isset($user["id"])) ? $user : null;
 	}
 
 	public function checkClient($clientKey) {
-		$data = ["mtpc_client" => $clientKey];
-		$request = $this->setupRequest("post", "clients/check", $data);
-		$request->addPostFields($data);
-		return $this->sendRequest($request);
+		$requestData = $this->setupRequestData(["mtpc_client" => $clientKey]);
+		return $this->sendRequest("post", "clients/check", $requestData);
 	}
 
 	public function getUserByEmail($email) {
@@ -215,74 +197,60 @@ class ApiClient {
 	}
 
 	public function activateUser($email) {
-		$data = ["email" => $email];
-		$request = $this->setupRequest("post", "users/activate", $data);
-		$request->addPostFields($data);
-		return $this->sendRequest($request);
+		$requestData = $this->setupRequestData(["email" => $email]);
+		return $this->sendRequest("post", "users/activate", $requestData);
 	}
 
 	public function generateIframeCode($token) {
-		$data = ["access_token" => $token];
-		$request = $this->setupRequest("post", "/generateIframeRandomCode", $data);
-		$request->addPostFields($data);
-		$response = $this->sendRequest($request);
-
+		$requestData = $this->setupRequestData(["access_token" => $token]);
+		return $this->sendRequest("post", "/generateIframeRandomCode", $requestData);
 	}
 
 	public function getPopularTags($userId) {
-		$url = "tags/popular/".$userId;
-		$request = $this->setupRequest("get", $url);
-		return $this->sendRequest($request);
+		return $this->sendRequest("get", "tags/popular/".$userId, $this->setupRequestData());
 	}
 
 	public function getClientClicksByDate($userId = null, array $resourceData = []) {
 		$url = "clicks/by-date";
 		if (is_numeric($userId)) $url .= "/".$userId;
-		$request = $this->setupRequest("get", $url, $resourceData);
-		$request->getQuery()->merge($resourceData);
-		return $this->sendRequest($request);
+		$requestData = $this->setupRequestData($resourceData);
+		return $this->sendRequest("get", $url, $requestData);
 	}
 
 	/**
-	 * @param RequestInterface $request
-	 *
+	 * @param $requestType
+	 * @param $url
+	 * @param $data
 	 * @return array|\Guzzle\Http\Message\Response
 	 */
-	protected function sendRequest(RequestInterface $request) {
+	protected function sendRequest($requestType, $url, $data) {
 		try {
-			$response = $request->send();
-			$this->lastRequest = $request;
+			$type = strtoupper($requestType);
+			$dataKey = ($type == "GET" || $type == "DELETE") ? "query" : "form_params";
+			$response = $this->apiClient->request($type, $url, [$dataKey => $data]);
 		}
-		catch (BadResponseException $e) {
+		catch (ClientException $e) {
 			$response = $e->getResponse();
 		}
 		$this->lastResponse = $response;
 		try {
-
-			return $response->json();
+			return \GuzzleHttp\json_decode($response->getBody(), true);
 		}
 		catch (Exception $e) {
-			return $response->getBody(true);
+			return $response->getBody();
 		}
 	}
 
 	/**
-	 * @param string $callMethod
-	 * @param string $url
 	 * @param array $arguments
-	 *
-	 * @return Request|EntityEnclosingRequest
+	 * @return array
 	 */
-	protected  function setupRequest($callMethod, $url, array $arguments = []) {
-		$request = $this->apiClient->$callMethod("/" . $url);
+	protected  function setupRequestData(array $arguments = []) {
 		$arguments["client_id"] = $this->clientId;
 		$timeStamp = date("Y-m-d H:i:s");
 		$authKey = $this->getAuthToken($arguments, $this->secretKey, $timeStamp);
-		$request->getQuery()
-			->set("access_token", $authKey)
-			->set("client_id", $this->clientId)
-			->set("mtpc_timestamp", $timeStamp);
-		return $request;
+		$authData = ["access_token" => $authKey, "client_id" => $this->clientId, "mtpc_timestamp" => $timeStamp];
+		return array_merge($arguments, $authData);
 	}
 
 	public function __call($method, $args) {
