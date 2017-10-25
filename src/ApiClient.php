@@ -2,13 +2,6 @@
 
 namespace MetaPic;
 
-use Exception;
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\ClientException;
-use GuzzleHttp\Psr7\Request;
-use GuzzleHttp\Psr7\Response;
-use Log;
-
 /**
  * @method array|string getUsers(array $userData = [])
  * @method array|string getRevenueTiers(array $revenueData = [])
@@ -226,19 +219,14 @@ class ApiClient {
 	protected function sendRequest($requestType, $url, $data) {
 		try {
 			$type = strtoupper($requestType);
-			$dataKey = ($type == "GET" || $type == "DELETE") ? "query" : "form_params";
+			$dataKey = (in_array($type, ["GET", "DELETE"])) ? "query" : "form_params";
 			$response = $this->apiClient->request($type, $url, [$dataKey => $data]);
 		}
-		catch (ClientException $e) {
-			$response = $e->getResponse();
+		catch (ApiException $e) {
+			$response = $e;
 		}
 		$this->lastResponse = $response;
-		try {
-			return \GuzzleHttp\json_decode($response->getBody(), true);
-		}
-		catch (Exception $e) {
-			return $response->getBody();
-		}
+		return json_decode($response->getBody(), true);
 	}
 
 	/**
