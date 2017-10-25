@@ -48,6 +48,7 @@ class Client {
 		curl_setopt($this->curl, CURLOPT_CUSTOMREQUEST, $method);
 		curl_setopt($this->curl, CURLOPT_TIMEOUT, $this->timeout);
 		curl_setopt($this->curl, CURLOPT_CONNECTTIMEOUT, $this->connect_timeout);
+		curl_setopt($this->curl, CURLOPT_RETURNTRANSFER, true);
 	}
 
 	private function setOptions(array $options) {
