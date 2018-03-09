@@ -224,7 +224,7 @@ class ApiClient {
 			$response = $this->apiClient->request($type, $url, [$dataKey => $data]);
 		}
 		catch (ApiException $e) {
-			$response = $e;
+			return $e;
 		}
 		$this->lastResponse = $response;
 		return json_decode($response->getBody(), true);
