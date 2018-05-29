@@ -171,11 +171,12 @@ class ApiClient {
 		return (isset($user["id"])) ? $user : null;
 	}
 
-	public function register($email, $password, $clientId = 591571223752267) {//default to metapic SE
+	public function register($email, $password, $clientId = 591571223752267, $username = "") {//default to metapic SE
 		$user = $this->sendRequest("post", "users/register", [
 			"email" => $email,
 			"password" => $password,
-			"client_id" => $clientId
+			"client_id" => $clientId,
+			"username" => $username
 		]);
 		return (isset($user["id"])) ? $user : null;
 	}
