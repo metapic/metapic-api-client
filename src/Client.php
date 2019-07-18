@@ -28,7 +28,8 @@ class Client {
 		if ($result === false) {
 			throw new ApiException("Curl error");
 		}
-		return new Response($result);
+        $responsCode = curl_getinfo($this->curl,CURLINFO_RESPONSE_CODE);
+		return new Response($result, $responsCode);
 	}
 
 	private function initRequest($method, $uri = '', array $options = []) {
