@@ -14,12 +14,18 @@ class Response {
 	 * @var string
 	 */
 	private $responseData;
+	private $responseCode;
 
-	public function __construct($responseData = "") {
+	public function __construct($responseData = "",$responseCode = 200) {
 		$this->responseData = $responseData;
+        $this->responseCode = $responseCode;
 	}
 
 	public function getBody() {
 		return $this->responseData;
 	}
+	public function getStatusCode(){
+        return $this->responseCode;
+    }
+
 }
