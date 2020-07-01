@@ -205,12 +205,42 @@ class ApiClient {
 		return $this->sendRequest("get", "tags/popular/".$userId, $this->setupRequestData());
 	}
 
+	public function getPaymentInvoice($id=null) {
+		$url= "/client/".$this->clientId."/paymentsInvoice";
+		if($id !== null) {
+			$url.="/".$id;
+		}
+		return $this->sendRequest("get", $url,  $this->setupRequestData());
+	}
+
+	public function getPaymentInvoiceLastMonth() {
+		return $this->sendRequest("get", "/client/".$this->clientId."/paymentsInvoice/lastMonth",  $this->setupRequestData());
+	}
+	public function getPaymentInvoiceThisMonth() {
+		return $this->sendRequest("get", "/client/".$this->clientId."/paymentsInvoice/thisMonth",  $this->setupRequestData());
+	}
+	
+
 	public function getClientClicksByDate($userId = null, array $resourceData = []) {
 		$url = "clicks/by-date";
 		if (is_numeric($userId)) $url .= "/".$userId;
 		$requestData = $this->setupRequestData($resourceData);
 		return $this->sendRequest("get", $url, $requestData);
 	}
+	public function getEarningBetween($userId = null, array $resourceData = []) {
+		$url = "getEarningBetween";
+		if (is_numeric($userId)) $url .= "/".$userId;
+		$requestData = $this->setupRequestData($resourceData);
+		return $this->sendRequest("get", $url, $requestData);
+	}
+
+
+
+	public function getHello(array $args = []) {
+		$requestData = $this->setupRequestData($args);
+		return $this->sendRequest("get", "/hello", $requestData);
+	}
+
 
 	/**
 	 * @param $requestType
