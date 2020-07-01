@@ -252,6 +252,9 @@ class ApiClient {
 		try {
 			$type = strtoupper($requestType);
 			$dataKey = (in_array($type, ["GET", "DELETE"])) ? "query" : "form_params";
+
+	
+			
 			$response = $this->apiClient->request($type, $url, [$dataKey => $data]);
 		}
 		catch (ApiException $e) {
